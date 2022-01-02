@@ -214,7 +214,7 @@ void Game1P::controlMino()
         }
     }
     //PAD PAD_RIGHT
-    if (Key[KEY_INPUT_A] >= 1) {
+    if (Key[KEY_INPUT_D] >= 1) {
         if(mino->getMinoCoordX() != pre_mino_coordx && mino->getMinoCoordY() != pre_mino_coordy)
             lockdown_count = 0;
 
@@ -255,7 +255,7 @@ void Game1P::controlMino()
         lockdown_count = 0;
     }
 
-    if (!CheckHitKeyAll(DX_CHECKINPUT_PAD)) {
+    if (!CheckHitKeyAll(DX_CHECKINPUT_KEY)) {
         autorepeat_count = 0;
         isautorepeat = false;
     }
