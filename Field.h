@@ -1,9 +1,13 @@
 #pragma once
+#include "DxLib.h"
+#include <vector>
 #define FIELD_SIDE_X 10
 #define FIELD_SIDE_Y 24
 #define FIELD_ASIDE_X FIELD_SIDE_X + 2
 #define FIELD_ASIDE_Y FIELD_SIDE_Y + 2
 #define BLOCK_SIZE 30
+
+using namespace std;
 
 class Field
 {
@@ -34,7 +38,8 @@ public:
 
 private:
 	int x, y;
-	int body[FIELD_ASIDE_Y][FIELD_ASIDE_X] = { 0 };
+	//int body[FIELD_ASIDE_Y][FIELD_ASIDE_X] = { 0 };
+	vector<vector<int>> body;
 	int color;
 	int grid_color;
 	int rotate_dir = 0;

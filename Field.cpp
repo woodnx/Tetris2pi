@@ -1,13 +1,20 @@
-#pragma once
 #include "Field.h"
-#include "DxLib.h"
 
 Field::Field()
 {
+	body.resize(FIELD_ASIDE_Y);
+	for (int i = 0; i < FIELD_ASIDE_Y; i++) {
+		body.at(i).resize(FIELD_ASIDE_X);
+	}
 }
 
 Field::Field(int x, int y)
 {
+	body.resize(FIELD_ASIDE_Y);
+	for (int i = 0; i < FIELD_ASIDE_Y; i++) {
+		body.at(i).resize(FIELD_ASIDE_X);
+	}
+
 	int i, j;
 	for (i = 0; i < FIELD_ASIDE_Y; i++) {
 		for (j = 0; j < FIELD_ASIDE_X; j++) {

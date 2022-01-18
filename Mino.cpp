@@ -1,12 +1,9 @@
 #pragma once
 #include "Mino.h"
-#include "Field.h"
-#include "include.h"
-#include "DxLib.h"
 
 Mino::Mino(int cx, int cy)
 {
-	memset(layout, 0, sizeof(layout));
+	fillLayout(0);
 
 	field = NULL;
 	this->coord_x = cx, this->coord_y = cy;
@@ -21,7 +18,7 @@ Mino::Mino(int cx, int cy)
 
 Mino::Mino(Field* _field)
 {
-	memset(layout, 0, sizeof(layout));
+	fillLayout(0);
 
 	field = _field;
 	this->coord_x = 0, this->coord_y = 0;
@@ -35,7 +32,7 @@ Mino::Mino(Field* _field)
 
 void Mino::InitMino()
 {
-	memset(layout, 0, sizeof(layout));
+	fillLayout(0);
 	this->num = -1;
 	this->color = -1;
 	this->rotate_center_x = -1;
@@ -64,7 +61,7 @@ int Mino::getMinoCoordY()
 // 0:I, 1:L, 2:J, 3:S, 4:Z, 5:O, 6:T
 void Mino::generateMino(int generate_mino_num)
 {
-	memset(layout, 0, sizeof(layout));
+	fillLayout(0);
 
 	//LoadDivGraph("Images/mino.png", 8, 8, 1, 16, 16, image);
 	switch (generate_mino_num) {
@@ -178,7 +175,7 @@ void Mino::generateMino(int generate_mino_num)
 
 void Mino::generateMino(int generate_mino_num, int field_x, int field_y)
 {
-	memset(layout, 0, sizeof(layout));
+	fillLayout(0);
 	this->field_x = field_x, this->field_y = field_y;
 	this->coord_x = field->elemXToCoordX(this->field_x);
 	this->coord_y = field->elemYToCoordY(this->field_y);
@@ -595,4 +592,16 @@ void Mino::drawStatus()
 	//DrawFormatString(250, 0, GetColor(255, 255, 255), "coord_x:%d, coord_y:%d", coord_x, coord_y);
 	//DrawFormatString(250, 20, GetColor(255, 255, 255), "field_x:%d, field_y:%d", field_x, field_y);
 	DrawFormatString(250, 30, GetColor(255, 255, 255), "rotate_dir :%d",rotate_dir);
+}
+
+int Mino::fillLayout(int val)
+{
+	if (layout.size() != 0) {
+		for (int i = 0; i < layout.size(); i++) {
+			for (int j = 0; j < layout.at(0).size(); j++) {
+				layout[i][j] = val;
+			}
+		}
+	}
+	return 0;
 }

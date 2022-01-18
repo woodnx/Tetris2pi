@@ -1,6 +1,11 @@
 #pragma once
 #include "Field.h"
+#include "include.h"
+#include "DxLib.h"
+#include <vector>
 #define LAYOUT_SIZE 4
+
+using namespace std;
 
 class Mino
 {
@@ -37,7 +42,13 @@ private:
 	Field* field;
 	int coord_x, coord_y;
 	int field_x, field_y;
-	int layout[LAYOUT_SIZE][LAYOUT_SIZE];	//ƒ~ƒm–{‘Ì
+	//int layout[LAYOUT_SIZE][LAYOUT_SIZE];	//ƒ~ƒm–{‘Ì
+	vector<vector<int>> layout = {
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0}
+	};
 	int num = -1;					// each Mino unique number
 	int color = -1;					// Mino color
 	int image[8] = { 0 };
@@ -45,4 +56,6 @@ private:
 	float rotate_center_x;			// an central array element when mino rotates
 	float rotate_center_y;			// an central array element when mino rotates
 	bool is_entity = false;			// judge NULL
+
+	int fillLayout(int val);
 };
