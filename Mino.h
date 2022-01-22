@@ -1,6 +1,6 @@
 #pragma once
-#include "Field.h"
 #include "Blocks.h"
+#include "Field.h"
 #include "include.h"
 #include "DxLib.h"
 #define LAYOUT_SIZE 4

@@ -1,6 +1,6 @@
 #pragma once
+#include "Blocks.h"
 #include "DxLib.h"
-#include <vector>
 #define FIELD_SIDE_X 10
 #define FIELD_SIDE_Y 24
 #define FIELD_ASIDE_X FIELD_SIDE_X + 2
@@ -9,10 +9,9 @@
 
 using namespace std;
 
-class Field
+class Field : public Blocks
 {
 public:
-	Field();
 	Field(int x, int y);
 
 	void InitField();
@@ -32,15 +31,9 @@ public:
 
 	bool containMino(int elem_x, int elem_y);
 
-	int selectColor(int mino_num);
-
 	void drawField();
 
 private:
-	int x, y;
-	//int body[FIELD_ASIDE_Y][FIELD_ASIDE_X] = { 0 };
-	vector<vector<int>> body;
 	int color;
 	int grid_color;
-	int rotate_dir = 0;
 };
