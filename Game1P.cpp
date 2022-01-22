@@ -525,8 +525,8 @@ void Game1P::Draw()
     DrawRoundRect(drx, dry, drx + STATIC_BLOCK_SIZE * 5 + 10, dry + STATIC_BLOCK_SIZE * 6 * 3, 10, 10, GetColor(0, 0, 0), TRUE);
 
     field->drawField();
-    ghost_mino->drawMino(true);
-    mino->drawMino(false);
+    ghost_mino->draw(false);
+    mino->draw(true);
     if(hold_enable)
         hold_mino->drawMino(false);
     else 
