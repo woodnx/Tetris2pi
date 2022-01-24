@@ -106,7 +106,7 @@ void Game1P::StartCountDown()
         PlaySoundMem(bgm_handle, DX_PLAYTYPE_LOOP);
 
         if (isGamestart) {
-            mino->generateMino(row.getMinoNum(0), gnrt_mx, gnrt_my);
+            mino->generateMinoWithPos(row.getMinoNum(0), gnrt_mx, gnrt_my);
             row.incrSeaqNum();
         }
         isGamestart = false;
@@ -116,14 +116,14 @@ void Game1P::StartCountDown()
 
 void Game1P::RestartGame()
 {
-    mino->InitMino();
+    mino->initialize();
     field->InitField();
     row.InitMinoRow();
-    ghost_mino->InitMino();
-    hold_mino->InitMino();
+    ghost_mino->initialize();
+    hold_mino->initialize();
 
     for (int i = 0; i < NEXT_REFER_SIZE; i++) {
-        next_mino[i]->InitMino();
+        next_mino[i]->initialize();
         next[i] = 0;
     }
 
@@ -433,7 +433,7 @@ void Game1P::installMino()
             mino->transcribeMinoToField();
         }
 
-        mino->generateMino(new_gnrt_mino, gnrt_mx, gnrt_my);
+        mino->generateMinoWithPos(new_gnrt_mino, gnrt_mx, gnrt_my);
 
         if(can_incrrow)row.incrSeaqNum();
 
@@ -525,14 +525,14 @@ void Game1P::Draw()
     DrawRoundRect(drx, dry, drx + STATIC_BLOCK_SIZE * 5 + 10, dry + STATIC_BLOCK_SIZE * 6 * 3, 10, 10, GetColor(0, 0, 0), TRUE);
 
     field->drawField();
-    ghost_mino->drawMino(true);
-    mino->drawMino(false);
+    ghost_mino->draw(false);
+    mino->draw(true);
     if(hold_enable)
-        hold_mino->drawMino(false);
+        hold_mino->draw(true);
     else 
-        hold_mino->drawMino(100);
+        hold_mino->draw(true, 100);
     for (int i = 0; i < NEXT_REFER_SIZE; i++) {
-        next_mino[i]->drawMino(false);
+        next_mino[i]->draw(true);
     }
 
     DrawStringToHandle(x - STATIC_BLOCK_SIZE * 5 + 5, y + 5, "HOLD", GetColor(255, 255, 255), score_font);

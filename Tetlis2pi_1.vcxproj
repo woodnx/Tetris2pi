@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseScene.cpp" />
+    <ClCompile Include="Blocks.cpp" />
     <ClCompile Include="Field.cpp" />
     <ClCompile Include="include.cpp" />
     <ClCompile Include="ISceneChanger.cpp" />
@@ -33,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseScene.h" />
+    <ClInclude Include="Blocks.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="include.h" />
     <ClInclude Include="ISceneChanger.h" />

@@ -1,47 +1,15 @@
-#pragma once
 #include "Mino.h"
-#include "Field.h"
-#include "include.h"
-#include "DxLib.h"
 
-Mino::Mino(int cx, int cy)
+Mino::Mino(Field* _field) : StaticMino(0, 0, BLOCK_SIZE)
 {
-	memset(layout, 0, sizeof(layout));
-
-	field = NULL;
-	this->coord_x = cx, this->coord_y = cy;
-	this->field_x = 0, this->field_y = 0;
-	this->num = -1;
-	this->color = -1;
-	this->rotate_center_x = -1;
-	this->rotate_center_y = -1;
-	this->rotate_dir = 0;
-	this->is_entity = false;
-}
-
-Mino::Mino(Field* _field)
-{
-	memset(layout, 0, sizeof(layout));
-
 	field = _field;
-	this->coord_x = 0, this->coord_y = 0;
 	this->field_x = 0, this->field_y = 0;
-	this->num = -1;
-	this->color = -1;
-	this->rotate_center_x = -1;
-	this->rotate_center_y = -1;
-	this->is_entity = false;
 }
 
-void Mino::InitMino()
+void Mino::initialize()
 {
-	memset(layout, 0, sizeof(layout));
-	this->num = -1;
-	this->color = -1;
-	this->rotate_center_x = -1;
-	this->rotate_center_y = -1;
+	fillLayout(0);
 	this->rotate_dir = 0;
-	this->is_entity = false;
 }
 
 int Mino::getMinoNum()
@@ -51,204 +19,36 @@ int Mino::getMinoNum()
 
 int Mino::getMinoCoordX()
 {
-	return this->coord_x;
+	return this->window.x;
 }
 
 int Mino::getMinoCoordY()
 {
-	return this->coord_y;
+	return this->window.y;
 }
 
-// genarate _mino
-// éwíËÇ≥ÇÍÇΩ gnrt__mino_num (_mino.num - 1) Ç…Ç†Ç¡ÇΩÉ~ÉmÇê∂ê¨Ç∑ÇÈ
-// 0:I, 1:L, 2:J, 3:S, 4:Z, 5:O, 6:T
-void Mino::generateMino(int generate_mino_num)
+void Mino::generateMinoWithPos(int generate_mino_num, int field_x, int field_y)
 {
-	memset(layout, 0, sizeof(layout));
-
-	//LoadDivGraph("Images/mino.png", 8, 8, 1, 16, 16, image);
-	switch (generate_mino_num) {
-	case 0:	//I
-		this->num = 1;
-		//			 Y  X
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-		this->layout[1][2] = this->num;
-		this->layout[1][3] = this->num;
-
-		this->color = GetColor(0, 191, 255);
-		this->rotate_center_x = 1.5f;
-		this->rotate_center_y = 1.5f;
-		this->is_entity = true;
-		break;
-
-	case 1:	//L
-		this->num = 2;
-		//			 Y  X
-		this->layout[0][2] = this->num;
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-		this->layout[1][2] = this->num;
-
-		this->color = GetColor(255, 165, 0);
-		this->rotate_center_x = 1.0f;
-		this->rotate_center_y = 1.0f;
-		this->is_entity = true;
-		break;
-
-	case 2:	//J
-		this->num = 3;
-		//			 Y  X
-		this->layout[0][0] = this->num;
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-		this->layout[1][2] = this->num;
-
-		this->color = GetColor(65, 105, 225);
-		this->rotate_center_x = 1.0f;
-		this->rotate_center_y = 1.0f;
-		this->is_entity = true;
-		break;
-
-	case 3:	//S
-		this->num = 4;
-		//			 Y  X
-		this->layout[0][1] = this->num;
-		this->layout[0][2] = this->num;
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-
-		this->color = GetColor(50, 205, 50);
-		this->rotate_center_x = 1.0f;
-		this->rotate_center_y = 1.0f;
-		this->is_entity = true;
-		break;
-
-	case 4:	//Z
-		this->num = 5;
-		//			 Y  X
-		this->layout[0][0] = this->num;
-		this->layout[0][1] = this->num;
-		this->layout[1][1] = this->num;
-		this->layout[1][2] = this->num;
-
-		this->color = GetColor(255, 99, 71);
-		this->rotate_center_x = 1.0f;
-		this->rotate_center_y = 1.0f;
-		this->is_entity = true;
-		break;
-
-	case 5:	//O
-		this->num = 6;
-		//			 Y  X
-		this->layout[0][0] = this->num;
-		this->layout[0][1] = this->num;
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-
-		this->color = GetColor(0xff, 0xff, 0x66);
-		this->rotate_center_x = 0.5f;
-		this->rotate_center_y = 0.5f;
-		this->is_entity = true;
-		break;
-
-	case 6:	//T
-		this->num = 7;
-		//			 Y  X
-		this->layout[0][1] = this->num;
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-		this->layout[1][2] = this->num;
-
-		this->color = GetColor(218, 112, 214);
-		this->rotate_center_x = 1;
-		this->rotate_center_y = 1;
-		this->is_entity = true;
-		break;
-
-	defalt:
-		this->num = -1;
-		this->color = -1;
-		this->rotate_center_x = -1;
-		this->rotate_center_y = -1;
-		this->is_entity = false;
-		break;
-	}
-}
-
-void Mino::generateMino(int generate_mino_num, int field_x, int field_y)
-{
-	memset(layout, 0, sizeof(layout));
+	fillLayout(0);
 	this->field_x = field_x, this->field_y = field_y;
-	this->coord_x = field->elemXToCoordX(this->field_x);
-	this->coord_y = field->elemYToCoordY(this->field_y);
+	this->window.x = field->elemXToCoordX(this->field_x);
+	this->window.y = field->elemYToCoordY(this->field_y);
 	this->rotate_dir = 0;
 
-	generateMino(generate_mino_num);
-}
-
-//É~ÉmÇÃâÒì]
-//âÒì]çsóÒÇégÇ¡ÇƒâÒì]Ç≥ÇπÇÈ
-void Mino::rotateMino(bool right_flag)
-{
-	int x, y;
-	int X = 0, Y = 0;
-	int lr = 1;
-	float a = 0, b = 0;
-	Mino tmp_mino = *this;
-
-	a = this->rotate_center_x;
-	b = this->rotate_center_y;
-
-	if (right_flag) { lr = -1; }
-
-	// Initialize _mino
-	for (x = 0; x < LAYOUT_SIZE; x++) {
-		for (y = 0; y < LAYOUT_SIZE; y++) {
-			this->layout[y][x] = 0;
-		}
-	}
-
-	for (y = 0; y < LAYOUT_SIZE; y++) {
-		for (x = 0; x < LAYOUT_SIZE; x++) {
-			// âÒì]çsóÒÇégÇ¡ÇƒâÒì]
-			// ïœä∑éÆÇÕâ∫ÇÃí ÇËÅi x -> X, y -> Y )
-			// --------------------------------------------------
-			// | X:  cos(90)( x - a ) - sin(90)( y - b ) + a	|
-			// |	 = -y + b + a								|
-			// |												|
-			// | Y:  sin(90)( x - a ) + cos(90)( y - b ) + b	|
-			// |	 =  x - a + b								|
-			// --------------------------------------------------
-
-			X = (int)(lr * (-y + a) + b);
-			Y = (int)(lr * ( x - a) + b);
-			if (X < 0 || Y < 0) continue;
-
-			this->layout[y][x] = tmp_mino.layout[Y][X];
-		}
-	}
-	if (right_flag) {
-		rotate_dir++;
-		if (rotate_dir >= 4) { rotate_dir = rotate_dir % 4; }
-	}
-	else {
-		rotate_dir--;
-		if (rotate_dir <= -1) { rotate_dir = (4 + rotate_dir) % 4; }
-	}
+	this->generateMino(generate_mino_num);
 }
 
 void Mino::rotateMinoWithCollision(bool right_flag)
 {
 	Mino tmp_mino = *this;
 	int tmp_rota_dir = this->rotate_dir;
-	tmp_mino.rotateMino(right_flag);
+	tmp_mino.rotate(right_flag);
 
 	if (!tmp_mino.collisionField()) {
-		this->rotateMino(right_flag);
+		this->rotate(right_flag);
 	}
 	else if(tmp_mino.superRotation(tmp_rota_dir, right_flag)) {
-		this->rotateMino(right_flag);
+		this->rotate(right_flag);
 		this->superRotation(tmp_rota_dir, right_flag);
 	}
 }
@@ -490,8 +290,8 @@ bool Mino::superRotation(int dir_old, bool right_flag)
 
 void Mino::moveMino(int dx, int dy)
 {
-	this->coord_x = field->elemXToCoordX(field_x += dx);
-	this->coord_y = field->elemYToCoordY(field_y += dy);
+	this->window.x = field->elemXToCoordX(field_x += dx);
+	this->window.y = field->elemYToCoordY(field_y += dy);
 }
 
 void Mino::moveMinoWithCollision(int dx, int dy)
@@ -512,10 +312,10 @@ void Mino::dropToMaxBottom()
 bool Mino::collisionField()
 {
 	int x, y;
-	for (y = 0; y < LAYOUT_SIZE; y++) {
-		for (x = 0; x < LAYOUT_SIZE; x++) {
-			int coll_x = field->coordXToElemX(this->coord_x + BLOCK_SIZE * x);
-			int coll_y = field->coordYToElemY(this->coord_y + BLOCK_SIZE * y);
+	for (y = 0; y < height(); y++) {
+		for (x = 0; x < width(); x++) {
+			int coll_x = field->coordXToElemX(this->window.x + block_size() *x);
+			int coll_y = field->coordYToElemY(this->window.y + block_size() * y);
 			if (this->layout[y][x] > 0 && field->getFieldValue(coll_x, coll_y) != 0) {
 				return true;
 			}
@@ -527,10 +327,10 @@ bool Mino::collisionField()
 bool Mino::collisionField(int dx, int dy)
 {
 	int x, y;
-	for (y = 0; y < LAYOUT_SIZE; y++) {
-		for (x = 0; x < LAYOUT_SIZE; x++) {
-			int coll_x = field->coordXToElemX(this->coord_x + BLOCK_SIZE * x) + dx;
-			int coll_y = field->coordYToElemY(this->coord_y + BLOCK_SIZE * y) + dy;
+	for (y = 0; y < height(); y++) {
+		for (x = 0; x < width(); x++) {
+			int coll_x = field->coordXToElemX(this->window.x + block_size() * x) + dx;
+			int coll_y = field->coordYToElemY(this->window.y + block_size() * y) + dy;
 			if (this->layout[y][x] > 0 && field->getFieldValue(coll_x, coll_y) != 0) {
 				return true;
 			}
@@ -542,49 +342,12 @@ bool Mino::collisionField(int dx, int dy)
 void Mino::transcribeMinoToField()
 {
 	int i, j;
-	for (i = 0; i < LAYOUT_SIZE; i++) {
-		for (j = 0; j < LAYOUT_SIZE; j++) {
-			int elem_x = field->coordXToElemX(this->coord_x) + j;
-			int elem_y = field->coordYToElemY(this->coord_y) + i;
-			field->setFieldValue(elem_x, elem_y, layout[i][j]);
-		}
-	}
-}
-
-void Mino::drawMino(bool is_ghost)
-{
-	int i, j;	// roop variables
-	int fillflag = is_ghost ? FALSE : TRUE;
-
-	for (i = 0; i < LAYOUT_SIZE; i++) {
-		for (j = 0; j < LAYOUT_SIZE; j++) {
-			if (this->layout[i][j] > 0) 
-			{
-				DrawBox(this->coord_x + BLOCK_SIZE * j, this->coord_y + BLOCK_SIZE * i,
-					this->coord_x + BLOCK_SIZE * (j + 1) - 1, this->coord_y + BLOCK_SIZE * (i + 1) - 1,
-					this->color, fillflag);
-				//DrawGraph(this->coord_x + BLOCK_SIZE * j, this->coord_y + BLOCK_SIZE * i, image[layout[i][j] - 1], FALSE);
-				//DrawExtendGraph(this->coord_x + BLOCK_SIZE * j, this->coord_y + BLOCK_SIZE * i,
-				//	this->coord_x + BLOCK_SIZE * (j + 1) - 1, this->coord_y + BLOCK_SIZE * (i + 1) - 1, image[num - 1], FALSE);
-			}
-		}
-	}
-}
-
-void Mino::drawMino(int alpha)
-{
-	int i, j;	// roop variables
-
-	for (i = 0; i < LAYOUT_SIZE; i++) {
-		for (j = 0; j < LAYOUT_SIZE; j++) {
-			if (this->layout[i][j] > 0) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
-				DrawBox(this->coord_x + BLOCK_SIZE * j, this->coord_y + BLOCK_SIZE * i,
-					this->coord_x + BLOCK_SIZE * (j + 1) - 1, this->coord_y + BLOCK_SIZE * (i + 1) - 1,
-					this->color, TRUE);
-				/*DrawExtendGraph(this->coord_x + BLOCK_SIZE * j, this->coord_y + BLOCK_SIZE * i,
-					this->coord_x + BLOCK_SIZE * (j + 1) - 1, this->coord_y + BLOCK_SIZE * (i + 1) - 1, image[0], TRUE);*/
-				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);		//ÉuÉåÉìÉhÉÇÅ[ÉhÇÉIÉt
+	for (i = 0; i < height(); i++) {
+		for (j = 0; j < width(); j++) {
+			int elem_x = field->coordXToElemX(this->window.x) + j;
+			int elem_y = field->coordYToElemY(this->window.y) + i;
+			if (layout[i][j] != 0) {
+				field->setFieldValue(elem_x, elem_y, layout[i][j]);
 			}
 		}
 	}
@@ -592,7 +355,7 @@ void Mino::drawMino(int alpha)
 
 void Mino::drawStatus()
 {
-	//DrawFormatString(250, 0, GetColor(255, 255, 255), "coord_x:%d, coord_y:%d", coord_x, coord_y);
+	//DrawFormatString(250, 0, GetColor(255, 255, 255), "window.x:%d, window.y:%d", window.x, window.y);
 	//DrawFormatString(250, 20, GetColor(255, 255, 255), "field_x:%d, field_y:%d", field_x, field_y);
 	DrawFormatString(250, 30, GetColor(255, 255, 255), "rotate_dir :%d",rotate_dir);
 }
