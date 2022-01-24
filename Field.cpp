@@ -103,9 +103,10 @@ int Field::elemYToCoordY(int elem_y)
 /// </summary>
 /// <param name="coord_x">ウィンドウx座標</param>
 /// <returns>フィールド配列のx要素</returns>
-int Field::coordXToElemX(int coord_x)
+int Field::coordXToElemX(int x)
 {
-	return (coord_x - window.x) / block_size();
+	int size = block_size();
+	return (x - window.x) / size;
 }
 
 /// <summary>
@@ -113,9 +114,10 @@ int Field::coordXToElemX(int coord_x)
 /// </summary>
 /// <param name="coord_y">ウィンドウy座標</param>
 /// <returns>フィールド配列のy要素</returns>
-int Field::coordYToElemY(int coord_y)
+int Field::coordYToElemY(int y)
 {
-	return (coord_y - window.y) / block_size();
+	int size = block_size();
+	return (y - window.y) / size;
 }
 
 /// <summary>
@@ -126,7 +128,7 @@ int Field::coordYToElemY(int coord_y)
 /// <returns></returns>
 int Field::getFieldValue(int elem_x, int elem_y)
 {
-	if (elem_x < 0 || elem_x > FIELD_ASIDE_X || elem_y < 0 || elem_y > FIELD_ASIDE_Y)return -1;
+	if (elem_x < 0 || elem_x > FIELD_ASIDE_X || elem_y < 0 || elem_y > FIELD_ASIDE_Y) return -1;
 	else return this->layout[elem_y][elem_x];
 }
 
@@ -138,9 +140,7 @@ int Field::getFieldValue(int elem_x, int elem_y)
 /// <param name="value">書き込む値</param>
 void Field::setFieldValue(int elem_x, int elem_y, int value)
 {
-	if (value != 0) {
-		layout[elem_y][elem_x] = value;
-	}
+	layout[elem_y][elem_x] = value;
 }
 
 /// <summary>

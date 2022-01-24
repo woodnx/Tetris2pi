@@ -1,19 +1,14 @@
-#pragma once
 #include "Mino.h"
 
-Mino::Mino(Field* _field) : Blocks({0, 0}, 4, 4, BLOCK_SIZE)
+Mino::Mino(Field* _field) : StaticMino(0, 0, BLOCK_SIZE)
 {
 	field = _field;
 	this->field_x = 0, this->field_y = 0;
-	this->num = -1;
-	this->color = -1;
 }
 
-void Mino::InitMino()
+void Mino::initialize()
 {
 	fillLayout(0);
-	this->num = -1;
-	this->color = -1;
 	this->rotate_dir = 0;
 }
 
@@ -32,104 +27,7 @@ int Mino::getMinoCoordY()
 	return this->window.y;
 }
 
-// genarate _mino
-// Žw’è‚³‚ê‚½ gnrt__mino_num (_mino.num - 1) ‚É‚ ‚Á‚½ƒ~ƒm‚ð¶¬‚·‚é
-// 0:I, 1:L, 2:J, 3:S, 4:Z, 5:O, 6:T
-void Mino::generateMino(int generate_mino_num)
-{
-	switch (generate_mino_num) {
-	case 0:	//I
-		this->num = Imino;
-		initLayout(4, 4);
-		//			 Y  X
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-		this->layout[1][2] = this->num;
-		this->layout[1][3] = this->num;
-
-		this->color = GetColor(0, 191, 255);
-		break;
-
-	case 1:	//L
-		this->num = Lmino;
-		initLayout(3, 3);
-		//			 Y  X
-		this->layout[0][2] = this->num;
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-		this->layout[1][2] = this->num;
-
-		this->color = GetColor(255, 165, 0);
-		break;
-
-	case 2:	//J
-		this->num = Jmino;
-		initLayout(3, 3);
-		//			 Y  X
-		this->layout[0][0] = this->num;
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-		this->layout[1][2] = this->num;
-
-		this->color = GetColor(65, 105, 225);
-		break;
-
-	case 3:	//S
-		this->num = Smino;
-		initLayout(3, 3);
-		//			 Y  X
-		this->layout[0][1] = this->num;
-		this->layout[0][2] = this->num;
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-
-		this->color = GetColor(50, 205, 50);
-		break;
-
-	case 4:	//Z
-		this->num = Zmino;
-		initLayout(3, 3);
-		//			 Y  X
-		this->layout[0][0] = this->num;
-		this->layout[0][1] = this->num;
-		this->layout[1][1] = this->num;
-		this->layout[1][2] = this->num;
-
-		this->color = GetColor(255, 99, 71);
-		break;
-
-	case 5:	//O
-		this->num = Omino;
-		initLayout(2, 2);
-		//			 Y  X
-		this->layout[0][0] = this->num;
-		this->layout[0][1] = this->num;
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-
-		this->color = GetColor(0xff, 0xff, 0x66);
-		break;
-
-	case 6:	//T
-		this->num = Tmino;
-		initLayout(3, 3);
-		//			 Y  X
-		this->layout[0][1] = this->num;
-		this->layout[1][0] = this->num;
-		this->layout[1][1] = this->num;
-		this->layout[1][2] = this->num;
-
-		this->color = GetColor(218, 112, 214);
-		break;
-
-	defalt:
-		this->num = -1;
-		this->color = -1;
-		break;
-	}
-}
-
-void Mino::generateMino(int generate_mino_num, int field_x, int field_y)
+void Mino::generateMinoWithPos(int generate_mino_num, int field_x, int field_y)
 {
 	fillLayout(0);
 	this->field_x = field_x, this->field_y = field_y;
@@ -137,7 +35,7 @@ void Mino::generateMino(int generate_mino_num, int field_x, int field_y)
 	this->window.y = field->elemYToCoordY(this->field_y);
 	this->rotate_dir = 0;
 
-	generateMino(generate_mino_num);
+	this->generateMino(generate_mino_num);
 }
 
 void Mino::rotateMinoWithCollision(bool right_flag)
@@ -448,7 +346,9 @@ void Mino::transcribeMinoToField()
 		for (j = 0; j < width(); j++) {
 			int elem_x = field->coordXToElemX(this->window.x) + j;
 			int elem_y = field->coordYToElemY(this->window.y) + i;
-			field->setFieldValue(elem_x, elem_y, layout[i][j]);
+			if (layout[i][j] != 0) {
+				field->setFieldValue(elem_x, elem_y, layout[i][j]);
+			}
 		}
 	}
 }
