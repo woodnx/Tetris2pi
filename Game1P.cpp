@@ -107,7 +107,7 @@ void Game1P::StartCountDown()
 
         if (isGamestart) {
             mino->generateMinoWithPos(row.getMinoNum(0), gnrt_mx, gnrt_my);
-            row.incrSeaqNum();
+            row.increase();
         }
         isGamestart = false;
     }
@@ -118,7 +118,7 @@ void Game1P::RestartGame()
 {
     mino->initialize();
     field->InitField();
-    row.InitMinoRow();
+    row.initialize();
     ghost_mino->initialize();
     hold_mino->initialize();
 
@@ -435,7 +435,7 @@ void Game1P::installMino()
 
         mino->generateMinoWithPos(new_gnrt_mino, gnrt_mx, gnrt_my);
 
-        if(can_incrrow)row.incrSeaqNum();
+        if(can_incrrow)row.increase();
 
         score += calcScore(level, drop_speed);
 

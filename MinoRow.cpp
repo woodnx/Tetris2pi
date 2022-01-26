@@ -1,64 +1,50 @@
-#pragma once
 #include "MinoRow.h"
-#include "DxLib.h"
 
 MinoRow::MinoRow()
 {
-    RowShuffle(&bag[now_bagnum]);
+    initialize();
 }
 
-void MinoRow::InitMinoRow()
+void MinoRow::initialize()
 {
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 7; j++) {
-            this->bag[i].body[j] = j + 1;
-        }
-
-        this->bag[i].nowelem = 0;
-        this->bag[i].isShuffled = false;
-    }
-    now_bagnum = 0;
-
-    this->RowShuffle(&bag[now_bagnum]);
+    this->initRow(mino_arr);
+    this->shuffleRow(mino_arr);
 }
 
-void MinoRow::incrSeaqNum()
+int MinoRow::increase()
 {
-    bag[now_bagnum].nowelem++;
-    if (bag[now_bagnum].nowelem == 7) {
-        shiftRow();
+    mino_arr.erase(mino_arr.begin());
+
+    //配列のサイズがNEXT_REFER_SIZE 以下なら新しくarrを作成し，連結．
+    if (mino_arr.size() < NEXT_REFER_SIZE) {
+        std::vector<int> add_arr;
+        initRow(add_arr);
+        shuffleRow(add_arr);
+        mino_arr.insert(mino_arr.end(), add_arr.begin(), add_arr.end());
     }
-    if (bag[now_bagnum].nowelem + NEXT_REFER_SIZE == 7) {
-        RowShuffle(&bag[!now_bagnum]);
-    }
+
+    return 0;
 }
 
-int MinoRow::getMinoNum(int elem)
+int MinoRow::getMinoNum(int refer_num)
 {
-    int refelem = bag[now_bagnum].nowelem + elem;
-
-    if (refelem < 7) {
-        return bag[now_bagnum].body[refelem] - 1;
-    }
-    else {
-        int ref_bagnum = !now_bagnum;
-        return bag[ref_bagnum].body[refelem % 7] - 1;
-    }
+    return mino_arr[refer_num];
 }
 
-void MinoRow::RowShuffle(Bag* _bag)
+void MinoRow::initRow(std::vector<int>& arr)
 {
-    for (int i = 6; i > 0; i--) {
-        int r = GetRand(6);
-        int tmp = _bag->body[i];
-        _bag->body[i] = _bag->body[r];
-        _bag->body[r] = tmp;
+    arr.resize(ALL_MINO_NUM);
+    for (int i = 0; i < arr.size(); i++) {
+        arr[i] = i;
     }
-    _bag[now_bagnum].isShuffled = true;
 }
 
-void MinoRow::shiftRow()
-{   
-    now_bagnum = !now_bagnum;
-    bag[now_bagnum].nowelem = 0;
+void MinoRow::shuffleRow(std::vector<int>& arr)
+{
+    for (int i = ALL_MINO_NUM - 1; i >= 0; i--) {
+        int r = GetRand(ALL_MINO_NUM - 1);
+        int tmp = arr[i];
+        arr[i] = arr[r];
+        arr[r] = tmp;
+    }
 }
