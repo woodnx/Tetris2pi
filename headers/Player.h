@@ -5,6 +5,7 @@
 #include "MinoRow.h"
 #include "Field.h"
 #include "BaseScene.h"
+#include "Sound.h"
 
 typedef enum {
 	ePause_Continue,	//‘±‚¯‚é
@@ -64,13 +65,7 @@ private:
 	int bgm_handle;
 	int score_font;
 
-	int pauseSE;
-	int countSE;
-	int moveSE;
-	int rotateSE;
-	int dropSE;
-	int holdSE;
-	int levelupSE;
+	Sound sound;
 
 	int opening_count;
 	bool iscount;
