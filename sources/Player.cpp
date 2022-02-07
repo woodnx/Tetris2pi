@@ -27,22 +27,21 @@ Player::Player(ISceneChanger* changer) : BaseScene(changer)
     pause_font = CreateFontToHandle("ニコ角", 40, 1, DX_FONTTYPE_ANTIALIASING);
     count_font = CreateFontToHandle("ニコ角", 75, 1, DX_FONTTYPE_ANTIALIASING);
 
-    bgm_handle = LoadSoundMem("sounds/tetlis2pi.mp3");
-    pauseSE = LoadSoundMem("sounds/警告音1.mp3");
-    
-    countSE = LoadSoundMem("sounds/Countdown06-1.mp3");
-    moveSE = LoadSoundMem("sounds/カーソル移動2.mp3");
-    rotateSE = LoadSoundMem("sounds/決定、ボタン押下35.mp3");
-    holdSE = LoadSoundMem("sounds/決定、ボタン押下40.mp3");
-    dropSE = LoadSoundMem("sounds/カーソル移動7.mp3");
-    levelupSE = LoadSoundMem("sounds/魔王魂 効果音 ワンポイント11.mp3");
+    sound.add("move",    "sounds/カーソル移動2.mp3");
+    sound.add("rotate",  "sounds/決定、ボタン押下35.mp3");
+    sound.add("hold",    "sounds/決定、ボタン押下40.mp3");
+    sound.add("drop",    "sounds/カーソル移動7.mp3");
+    sound.add("levelup", "sounds/魔王魂 効果音 ワンポイント11.mp3");
+    sound.add("select",  "sounds/カーソル移動2.mp3");
+    sound.add("dicision","sounds/決定、ボタン押下26.mp3");
+    sound.add("menuBGM", "sounds/決定、ボタン押下24.mp3");
 
-    int SEVol = 70;
-    ChangeVolumeSoundMem(255 * SEVol / 100, moveSE);
-    ChangeVolumeSoundMem(255 * SEVol * 0.85 / 100, rotateSE);
-    ChangeVolumeSoundMem(255 * SEVol / 100, holdSE);
-    ChangeVolumeSoundMem(255 * SEVol / 100, dropSE);
-    ChangeVolumeSoundMem(255 * SEVol / 100, levelupSE);
+    sound.changeAllSoundVolume(70);
+    sound.changeVolume("rotate", 60);
+
+    sound.add("pause", "sounds/警告音1.mp3");
+    sound.add("count", "sounds/Countdown06-1.mp3");
+    sound.add("bgm", "sounds/tetlis2pi.mp3");
 
     gnrt_mx = FIELD_SIDE_X / 2, gnrt_my = 4;
     opening_count = 3;
@@ -78,17 +77,12 @@ Player::Player(ISceneChanger* changer) : BaseScene(changer)
 
 void Player::Initialize()
 {
-    selectSE = LoadSoundMem("sounds/カーソル移動2.mp3");
-    decisionSE = LoadSoundMem("sounds/決定、ボタン押下26.mp3");
-
-    menuBGM = LoadSoundMem("sounds/決定、ボタン押下24.mp3");
-    ChangeVolumeSoundMem(255 * 80 / 100, menuBGM);
-    PlaySoundMem(countSE, DX_PLAYTYPE_BACK);
+    sound.play("count", DX_PLAYTYPE_BACK);
 }
 
 void Player::StartCountDown()
 {
-    StopSoundMem(bgm_handle);
+    sound.stop("bgm");
     if (t % 45 == 0) {
         opening_count--;
     }
@@ -96,7 +90,7 @@ void Player::StartCountDown()
         t = -1;
         iscount = false;
         opening_count = 2;
-        PlaySoundMem(bgm_handle, DX_PLAYTYPE_LOOP);
+        sound.play("bgm", DX_PLAYTYPE_LOOP);
 
         if (isGamestart) {
             mino->generateMinoWithPos(row.getMinoNum(0), gnrt_mx, gnrt_my);
@@ -150,13 +144,13 @@ void Player::RestartGame()
 
     pause_y = 0;
 
-    PlaySoundMem(countSE, DX_PLAYTYPE_BACK);
+    sound.play("count", DX_PLAYTYPE_BACK);
 }
 
 void Player::Update()
 {
     if (Key[KEY_INPUT_ESCAPE] == 1 && !iscount) {
-        PlaySoundMem(pauseSE, DX_PLAYTYPE_BACK);
+        sound.play("pause", DX_PLAYTYPE_BACK);
         ispause = true;
         iscount = false;
     }
@@ -189,14 +183,14 @@ void Player::controlMino()
         if (autorepeat_count == 0) {
             if (!mino->collisionField(-1, 0)) {
                 mino->moveMino(-1, 0);
-                PlaySoundMem(moveSE, DX_PLAYTYPE_BACK);
+                sound.play("move", DX_PLAYTYPE_BACK);
             }
             autorepeat_count++;
         }
         else if (isautorepeat && t % 3 == 0) {
             if (!mino->collisionField(-1, 0)) {
                 mino->moveMino(-1, 0);
-                PlaySoundMem(moveSE, DX_PLAYTYPE_BACK);
+                sound.play("move", DX_PLAYTYPE_BACK);
             }
         }
         else if (autorepeat_count == 9) {
@@ -214,14 +208,14 @@ void Player::controlMino()
         if (autorepeat_count == 0) {
             if (!mino->collisionField(1, 0)) {
                 mino->moveMino(1, 0);
-                PlaySoundMem(moveSE, DX_PLAYTYPE_BACK);
+                sound.play("move", DX_PLAYTYPE_BACK);
             }
             autorepeat_count++;
         }
         else if (isautorepeat && t % 3 == 0) {
             if (!mino->collisionField(1, 0)) {
                 mino->moveMino(1, 0);
-                PlaySoundMem(moveSE, DX_PLAYTYPE_BACK);
+                sound.play("move", DX_PLAYTYPE_BACK);
             }
         }
         else if (autorepeat_count == 9) {
@@ -237,14 +231,14 @@ void Player::controlMino()
     if (Key[KEY_INPUT_L] == 1)
     {
         mino->rotateMinoWithCollision(true);
-        PlaySoundMem(rotateSE, DX_PLAYTYPE_BACK);
+        sound.play("rotate", DX_PLAYTYPE_BACK);
         lockdown_count = 0;
     }
     //PAD PAD_3
     if (Key[KEY_INPUT_K] == 1)
     {
         mino->rotateMinoWithCollision(false);
-        PlaySoundMem(rotateSE, DX_PLAYTYPE_BACK);
+        sound.play("rotate", DX_PLAYTYPE_BACK);
         lockdown_count = 0;
     }
 
@@ -269,7 +263,7 @@ void Player::dropMino()
     else if (Key[KEY_INPUT_S] >= 1 && t % 3 == 0) {   //ソフトドロップ
         if (!mino->collisionField(0, 1)) {
             mino->moveMino(0, 1);
-            PlaySoundMem(moveSE, DX_PLAYTYPE_BACK);
+            sound.play("move", DX_PLAYTYPE_BACK);
         }
         else {
             isbottom = true;
@@ -318,7 +312,7 @@ void Player::holdMino()
 {
     //PAD Key[PAD_5] == 1 || Key[PAD_7] == 1
     if (Key[KEY_INPUT_SPACE] && hold_enable) {
-        PlaySoundMem(holdSE, DX_PLAYTYPE_BACK);
+        sound.play("hold", DX_PLAYTYPE_BACK);
         if (hold_mino_num == -1) {
             hold_mino_num = mino->getMinoNum();
             hold_mino->generateMino(hold_mino_num);
@@ -379,7 +373,7 @@ void Player::levelControl()
     sum_linenum += erase_linenum;
     level = sum_linenum / 10 + 1;
     if (level != tmp_level) {
-        PlaySoundMem(levelupSE, DX_PLAYTYPE_BACK);
+        sound.play("levelup", DX_PLAYTYPE_BACK);
         if (drop_speed != 1) {
             drop_speed /= 1.5;
         }
@@ -390,27 +384,27 @@ void Player::pause()
 {
     if (ispause) {
         if (Key[KEY_INPUT_S] == 1) {                 //下キーが押されていたら
-            PlaySoundMem(selectSE, DX_PLAYTYPE_BACK);
+            sound.play("select", DX_PLAYTYPE_BACK);
             NowSelect = (NowSelect + 1) % ePause_Num;   //選択状態を一つ下げる
         }
         if (Key[KEY_INPUT_W] == 1) {//上キーが押されていたら
-            PlaySoundMem(selectSE, DX_PLAYTYPE_BACK);
+            sound.play("select", DX_PLAYTYPE_BACK);
             NowSelect = (NowSelect + (ePause_Num - 1)) % ePause_Num;    //選択状態を一つ上げる
         }
         if (Key[KEY_INPUT_SPACE] == 1) {    //エンターキーが押されたら
-            PlaySoundMem(decisionSE, DX_PLAYTYPE_BACK);
+            sound.play("decision", DX_PLAYTYPE_BACK);
             switch (NowSelect) {        //現在選択中の状態によって処理を分岐
             case ePause_Continue: 
                 iscount = true;
                 ispause = false;
-                PlaySoundMem(countSE, DX_PLAYTYPE_BACK);
+                sound.play("count", DX_PLAYTYPE_BACK);
                 break;                
             case ePause_Restart:
-                StopSoundMem(bgm_handle);
+                sound.stop("bgm");
                 RestartGame();
                 break;
             case ePause_End://設定選択中なら
-                StopSoundMem(bgm_handle);
+                sound.stop("bgm");
                 mSceneChanger->ChangeScene(eScene_Menu);
                 break;
             }
@@ -422,7 +416,7 @@ void Player::installMino()
 {
     if (can_generate){
         if (can_transcribe) {
-            PlaySoundMem(dropSE, DX_PLAYTYPE_BACK);
+            sound.play("drop", DX_PLAYTYPE_BACK);
             mino->transcribeMinoToField();
         }
 
@@ -445,13 +439,13 @@ void Player::installMino()
 void Player::GameResult()
 {
     if (field->containMino(gnrt_mx, gnrt_my) || field->containMino(gnrt_mx + 1, gnrt_my)) {
-        StopSoundMem(bgm_handle);
-        PlaySoundMem(menuBGM, DX_PLAYTYPE_BACK);
+        sound.stop("bgm");
+        sound.play("menuBGM", DX_PLAYTYPE_BACK);
         isGameOver = true;
     }
     else if (sum_linenum >= max_linenum) {
-        StopSoundMem(bgm_handle);
-        PlaySoundMem(menuBGM, DX_PLAYTYPE_BACK);
+        sound.stop("bgm");
+        sound.play("menuBGM", DX_PLAYTYPE_BACK);
         isGameClear = true;
     }
 }
@@ -461,15 +455,15 @@ void Player::GameClear()
     if (isGameClear) {
 
         if (Key[KEY_INPUT_S] == 1) {                 //下キーが押されていたら
-            PlaySoundMem(selectSE, DX_PLAYTYPE_BACK);
+            sound.play("select", DX_PLAYTYPE_BACK);
             NowSelect = (NowSelect + 1) % eResult_Num;   //選択状態を一つ下げる
         }
         if (Key[KEY_INPUT_W] == 1) {//上キーが押されていたら
-            PlaySoundMem(selectSE, DX_PLAYTYPE_BACK);
+            sound.play("select", DX_PLAYTYPE_BACK);
             NowSelect = (NowSelect + (eResult_Num - 1)) % eResult_Num;    //選択状態を一つ上げる
         }
         if (Key[KEY_INPUT_SPACE] == 1) {    //エンターキーが押されたら
-            PlaySoundMem(decisionSE, DX_PLAYTYPE_BACK);
+            sound.play("decision", DX_PLAYTYPE_BACK);
             switch (NowSelect) {        //現在選択中の状態によって処理を分岐
             case eResult_Restart:
                 RestartGame();
@@ -478,7 +472,7 @@ void Player::GameClear()
                 mSceneChanger->ChangeScene(eScene_Menu);
                 break;
             }
-            StopSoundMem(menuBGM);
+            sound.stop("menuBGM");
         }
     }
 }
@@ -487,15 +481,15 @@ void Player::GameOver()
 {
     if (isGameOver) {
         if (Key[KEY_INPUT_S] == 1) {                 //下キーが押されていたら
-            PlaySoundMem(selectSE, DX_PLAYTYPE_BACK);
+            sound.play("select", DX_PLAYTYPE_BACK);
             NowSelect = (NowSelect + 1) % eResult_Num;   //選択状態を一つ下げる
         }
         if (Key[KEY_INPUT_W] == 1) {//上キーが押されていたら
-            PlaySoundMem(selectSE, DX_PLAYTYPE_BACK);
+            sound.play("select", DX_PLAYTYPE_BACK);
             NowSelect = (NowSelect + (eResult_Num - 1)) % eResult_Num;    //選択状態を一つ上げる
         }
         if (Key[KEY_INPUT_SPACE] == 1) {    //エンターキーが押されたら
-            PlaySoundMem(decisionSE, DX_PLAYTYPE_BACK);
+            sound.play("decision", DX_PLAYTYPE_BACK);
             switch (NowSelect) {        //現在選択中の状態によって処理を分岐
             case eResult_Restart:
                 RestartGame();
@@ -504,7 +498,7 @@ void Player::GameOver()
                 mSceneChanger->ChangeScene(eScene_Menu);
                 break;
             }
-            StopSoundMem(menuBGM);
+            sound.stop("menuBGM");
         }
     }
 }
@@ -632,6 +626,7 @@ void Player::Finalize()
     delete(hold_mino);
 
     InitFontToHandle();
+    sound.finalize();
 
     for (int i = 0; i < NEXT_REFER_SIZE; i++) {
         delete(next_mino[i]);
