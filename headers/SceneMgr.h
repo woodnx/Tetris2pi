@@ -1,6 +1,6 @@
 #pragma once
 #include "ISceneChanger.h"
-#include "Player.h"
+#include "OnePlayerGame.h"
 #include "Menu.h"
 #include "BaseScene.h"
 
