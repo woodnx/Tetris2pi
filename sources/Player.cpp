@@ -1,108 +1,131 @@
 #include "../headers/Player.h"
 
-Player::Player(ISceneChanger* changer) : BaseScene(changer)
+Player::Player()
 {
-    x = 380, y = 50;
-
-	field = new Field(x, y - BLOCK_SIZE * 5);
-	mino = new Mino(field);
-    ghost_mino = new Mino(field);
-    hold_mino = new StaticMino(x - STATIC_BLOCK_SIZE * 4, y + STATIC_BLOCK_SIZE * 1.5 + 10);
-
-    for (int i = 0; i < NEXT_REFER_SIZE; i++) {
-        next_mino[i] = new StaticMino(x + FIELD_SIDE_X * BLOCK_SIZE + 70, y + i * STATIC_BLOCK_SIZE * 2.8 + 35);
-        next[i] = 0;
-    }
-
-    if (fopen_s(&fp, "savedates/highscore_normal.txt", "r") != NULL) {
-        //ファイルオープン失敗
-    }
-    else {
-        fscanf_s(fp, "%d", &highscore);
-        fclose(fp);
-    }
-
+    // 画像・フォントハンドル
     background_handle = LoadGraph("images/Back_Cyber_1920.jpg");
-    score_font = CreateFontToHandle("ニコ角", 25, 1, DX_FONTTYPE_ANTIALIASING);
-    pause_font = CreateFontToHandle("ニコ角", 40, 1, DX_FONTTYPE_ANTIALIASING);
-    count_font = CreateFontToHandle("ニコ角", 75, 1, DX_FONTTYPE_ANTIALIASING);
+    index_font = CreateFontToHandle("ニコ角", 25, 1, DX_FONTTYPE_ANTIALIASING);
+    figure_font = CreateFontToHandle("ニコ角", 40, 1, DX_FONTTYPE_ANTIALIASING);
 
+    // 各種サウンド
     sound.add("move",    "sounds/カーソル移動2.mp3");
     sound.add("rotate",  "sounds/決定、ボタン押下35.mp3");
     sound.add("hold",    "sounds/決定、ボタン押下40.mp3");
     sound.add("drop",    "sounds/カーソル移動7.mp3");
     sound.add("levelup", "sounds/魔王魂 効果音 ワンポイント11.mp3");
-    sound.add("select",  "sounds/カーソル移動2.mp3");
-    sound.add("dicision","sounds/決定、ボタン押下26.mp3");
-    sound.add("menuBGM", "sounds/決定、ボタン押下24.mp3");
 
     sound.changeAllSoundVolume(70);
     sound.changeVolume("rotate", 60);
 
-    sound.add("pause", "sounds/警告音1.mp3");
-    sound.add("count", "sounds/Countdown06-1.mp3");
-    sound.add("bgm", "sounds/tetlis2pi.mp3");
-
+    // 座標
+    x = 380, y = 50;
     gnrt_mx = FIELD_SIDE_X / 2, gnrt_my = 4;
-    opening_count = 3;
-    iscount = true;
-    isGamestart = true;
+    pre_mino_coordx = gnrt_mx;
+    pre_mino_coordy = gnrt_my;
+
+    // スコア・難易度
     level = 1;
     score = 0;
     ren_num = 0;
+    drop_speed = 60;
+
+    // オートリピート
     t = -1;
     lockdown_count = 0;
     autorepeat_count = 0;
     isautorepeat = false;
+
+    // mino生成
     new_gnrt_mino = 0;
+    isbottom = false;
     can_generate = false;
     can_transcribe = false;
     can_incrrow = false;
+
+    // ライン削除
     erase_linenum = 0;
     sum_linenum = 0;
     levelup_count = 0;
-    drop_speed = 60;
-    isbottom = false;
-    row_num = 0;
+
+    // ホールド
     hold_mino_num = -1;
     hold_enable = true;
-    isGameOver = false;
-    isGameClear = false;
-    max_linenum = 100;
-    ispause = false;
-    NowSelect = ePause_Continue;
 
-    pause_y = 0;
-}
+    field = new Field(x, y - BLOCK_SIZE * 5);
+    mino = new Mino(field);
+    ghost_mino = new Mino(field);
+    hold_mino = new StaticMino(x - STATIC_BLOCK_SIZE * 4, y + STATIC_BLOCK_SIZE * 1.5 + 10);
 
-void Player::Initialize()
-{
-    sound.play("count", DX_PLAYTYPE_BACK);
-}
-
-void Player::StartCountDown()
-{
-    sound.stop("bgm");
-    if (t % 45 == 0) {
-        opening_count--;
+    for (int i = 0; i < NEXT_REFER_SIZE; i++) {
+        next_mino[i] = new StaticMino(x + FIELD_SIDE_X * BLOCK_SIZE + 70, y + i * STATIC_BLOCK_SIZE * 2.8 + 35);
     }
-    if (opening_count < 0) {
-        t = -1;
-        iscount = false;
-        opening_count = 2;
-        sound.play("bgm", DX_PLAYTYPE_LOOP);
-
-        if (isGamestart) {
-            mino->generateMinoWithPos(row.getMinoNum(0), gnrt_mx, gnrt_my);
-            row.increase();
-        }
-        isGamestart = false;
-    }
-    t++;
 }
 
-void Player::RestartGame()
+Player::Player(int x, int y)
 {
+
+    // 画像・フォントハンドル
+    background_handle = LoadGraph("images/Back_Cyber_1920.jpg");
+    index_font = CreateFontToHandle("ニコ角", 25, 1, DX_FONTTYPE_ANTIALIASING);
+    figure_font = CreateFontToHandle("ニコ角", 40, 1, DX_FONTTYPE_ANTIALIASING);
+
+    // 各種サウンド
+    sound.add("move", "sounds/カーソル移動2.mp3");
+    sound.add("rotate", "sounds/決定、ボタン押下35.mp3");
+    sound.add("hold", "sounds/決定、ボタン押下40.mp3");
+    sound.add("drop", "sounds/カーソル移動7.mp3");
+    sound.add("levelup", "sounds/魔王魂 効果音 ワンポイント11.mp3");
+
+    sound.changeAllSoundVolume(70);
+    sound.changeVolume("rotate", 60);
+
+    // 座標
+    this->x = x, this->y = y;
+    gnrt_mx = FIELD_SIDE_X / 2, gnrt_my = 4;
+    pre_mino_coordx = gnrt_mx;
+    pre_mino_coordy = gnrt_my;
+
+    // スコア・難易度
+    level = 1;
+    score = 0;
+    ren_num = 0;
+    drop_speed = 60;
+
+    // オートリピート
+    t = -1;
+    lockdown_count = 0;
+    autorepeat_count = 0;
+    isautorepeat = false;
+
+    // mino生成
+    new_gnrt_mino = 0;
+    isbottom = false;
+    can_generate = false;
+    can_transcribe = false;
+    can_incrrow = false;
+
+    // ライン削除
+    erase_linenum = 0;
+    sum_linenum = 0;
+    levelup_count = 0;
+
+    // ホールド
+    hold_mino_num = -1;
+    hold_enable = true;
+
+    field = new Field(x, y - BLOCK_SIZE * 5);
+    mino = new Mino(field);
+    ghost_mino = new Mino(field);
+    hold_mino = new StaticMino(x - STATIC_BLOCK_SIZE * 4, y + STATIC_BLOCK_SIZE * 1.5 + 10);
+
+    for (int i = 0; i < NEXT_REFER_SIZE; i++) {
+        next_mino[i] = new StaticMino(x + FIELD_SIDE_X * BLOCK_SIZE + 70, y + i * STATIC_BLOCK_SIZE * 2.8 + 35);
+    }
+}
+
+void Player::initialize()
+{
+    // 主要クラス
     mino->initialize();
     field->InitField();
     row.initialize();
@@ -111,65 +134,52 @@ void Player::RestartGame()
 
     for (int i = 0; i < NEXT_REFER_SIZE; i++) {
         next_mino[i]->initialize();
-        next[i] = 0;
     }
 
-    opening_count = 3;
-    iscount = true;
-    isGamestart = true;
+    // 難易度
     level = 1;
     score = 0;
     ren_num = 0;
+    drop_speed = 60;
+
+    // オートリピート
     t = -1;
     lockdown_count = 0;
     autorepeat_count = 0;
     isautorepeat = false;
+
+    // mino生成
     new_gnrt_mino = 0;
+    isbottom = false;
     can_generate = false;
     can_transcribe = false;
     can_incrrow = false;
+
+    // ライン消去
     erase_linenum = 0;
     sum_linenum = 0;
     levelup_count = 0;
-    drop_speed = 60;
-    isbottom = false;
-    row_num = 0;
+
+    // ホールド
     hold_mino_num = -1;
     hold_enable = true;
-    isGameOver = false;
-    isGameClear = false;
-    max_linenum = 100;
-    ispause = false;
-    NowSelect = ePause_Continue;
-
-    pause_y = 0;
-
-    sound.play("count", DX_PLAYTYPE_BACK);
 }
 
-void Player::Update()
+void Player::startProcess()
 {
-    if (Key[KEY_INPUT_ESCAPE] == 1 && !iscount) {
-        sound.play("pause", DX_PLAYTYPE_BACK);
-        ispause = true;
-        iscount = false;
-    }
+    mino->generateMinoWithPos(row.getMinoNum(0), gnrt_mx, gnrt_my);
+    row.increase();
+}
 
-    if (ispause) pause();
-    else if (iscount) StartCountDown();
-    else if (isGameClear) GameClear();
-    else if (isGameOver) GameOver();
-    else {
-        GameResult();
-        installMino();
-        controlMino();
-        dropMino();
-        holdMino();
-        makeGhost();
-        setNext();
-
-        t++;
-    }
+void Player::update()
+{
+    installMino();
+    controlMino();
+    dropMino();
+    holdMino();
+    makeGhost();
+    setNext();
+    t++;
 }
 
 void Player::controlMino()
@@ -380,38 +390,6 @@ void Player::levelControl()
     }
 }
 
-void Player::pause()
-{
-    if (ispause) {
-        if (Key[KEY_INPUT_S] == 1) {                 //下キーが押されていたら
-            sound.play("select", DX_PLAYTYPE_BACK);
-            NowSelect = (NowSelect + 1) % ePause_Num;   //選択状態を一つ下げる
-        }
-        if (Key[KEY_INPUT_W] == 1) {//上キーが押されていたら
-            sound.play("select", DX_PLAYTYPE_BACK);
-            NowSelect = (NowSelect + (ePause_Num - 1)) % ePause_Num;    //選択状態を一つ上げる
-        }
-        if (Key[KEY_INPUT_SPACE] == 1) {    //エンターキーが押されたら
-            sound.play("decision", DX_PLAYTYPE_BACK);
-            switch (NowSelect) {        //現在選択中の状態によって処理を分岐
-            case ePause_Continue: 
-                iscount = true;
-                ispause = false;
-                sound.play("count", DX_PLAYTYPE_BACK);
-                break;                
-            case ePause_Restart:
-                sound.stop("bgm");
-                RestartGame();
-                break;
-            case ePause_End://設定選択中なら
-                sound.stop("bgm");
-                mSceneChanger->ChangeScene(eScene_Menu);
-                break;
-            }
-        }
-    }
-}
-
 void Player::installMino()
 {
     if (can_generate){
@@ -436,74 +414,19 @@ void Player::installMino()
     }
 }
 
-void Player::GameResult()
+int Player::judgeGameResult()
 {
     if (field->containMino(gnrt_mx, gnrt_my) || field->containMino(gnrt_mx + 1, gnrt_my)) {
-        sound.stop("bgm");
-        sound.play("menuBGM", DX_PLAYTYPE_BACK);
-        isGameOver = true;
+        return -1;
     }
     else if (sum_linenum >= max_linenum) {
-        sound.stop("bgm");
-        sound.play("menuBGM", DX_PLAYTYPE_BACK);
-        isGameClear = true;
+        return 1;
     }
+
+    return 0;
 }
 
-void Player::GameClear()
-{
-    if (isGameClear) {
-
-        if (Key[KEY_INPUT_S] == 1) {                 //下キーが押されていたら
-            sound.play("select", DX_PLAYTYPE_BACK);
-            NowSelect = (NowSelect + 1) % eResult_Num;   //選択状態を一つ下げる
-        }
-        if (Key[KEY_INPUT_W] == 1) {//上キーが押されていたら
-            sound.play("select", DX_PLAYTYPE_BACK);
-            NowSelect = (NowSelect + (eResult_Num - 1)) % eResult_Num;    //選択状態を一つ上げる
-        }
-        if (Key[KEY_INPUT_SPACE] == 1) {    //エンターキーが押されたら
-            sound.play("decision", DX_PLAYTYPE_BACK);
-            switch (NowSelect) {        //現在選択中の状態によって処理を分岐
-            case eResult_Restart:
-                RestartGame();
-                break;
-            case eResult_End://設定選択中な
-                mSceneChanger->ChangeScene(eScene_Menu);
-                break;
-            }
-            sound.stop("menuBGM");
-        }
-    }
-}
-
-void Player::GameOver()
-{
-    if (isGameOver) {
-        if (Key[KEY_INPUT_S] == 1) {                 //下キーが押されていたら
-            sound.play("select", DX_PLAYTYPE_BACK);
-            NowSelect = (NowSelect + 1) % eResult_Num;   //選択状態を一つ下げる
-        }
-        if (Key[KEY_INPUT_W] == 1) {//上キーが押されていたら
-            sound.play("select", DX_PLAYTYPE_BACK);
-            NowSelect = (NowSelect + (eResult_Num - 1)) % eResult_Num;    //選択状態を一つ上げる
-        }
-        if (Key[KEY_INPUT_SPACE] == 1) {    //エンターキーが押されたら
-            sound.play("decision", DX_PLAYTYPE_BACK);
-            switch (NowSelect) {        //現在選択中の状態によって処理を分岐
-            case eResult_Restart:
-                RestartGame();
-                break;
-            case eResult_End://設定選択中なら
-                mSceneChanger->ChangeScene(eScene_Menu);
-                break;
-            }
-            sound.stop("menuBGM");
-        }
-    }
-}
-
-void Player::Draw()
+void Player::draw()
 {
     DrawGraph(0, 0, background_handle, TRUE);
     int drx = x - STATIC_BLOCK_SIZE * 5, dry = y;
@@ -522,103 +445,19 @@ void Player::Draw()
         next_mino[i]->draw(true);
     }
 
-    DrawStringToHandle(x - STATIC_BLOCK_SIZE * 5 + 5, y + 5, "HOLD", GetColor(255, 255, 255), score_font);
-    DrawStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 50 + 5, y + 5, "NEXT", GetColor(255, 255, 255), score_font);
-    DrawStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 50, y + STATIC_BLOCK_SIZE * 6 * 3, "SCORE", GetColor(255, 255, 255), score_font);
-    DrawFormatStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 70, y + STATIC_BLOCK_SIZE * 6 * 3 + 20, GetColor(255, 255, 255), pause_font, "%d", score);
-    DrawStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 50, y + STATIC_BLOCK_SIZE * 6 * 3 + 60, "HIGH SCORE", GetColor(255, 255, 255), score_font);
-    DrawFormatStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 70, y + STATIC_BLOCK_SIZE * 6 * 3 + 80, GetColor(255, 255, 255), pause_font, "%d", highscore);
-    DrawStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 50, y + STATIC_BLOCK_SIZE * 6 * 3 + 120, "LEVEL", GetColor(255, 255, 255), score_font);
-    DrawFormatStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 70, y + STATIC_BLOCK_SIZE * 6 * 3 + 140, GetColor(255, 255, 255), pause_font, "%d", level);
-    DrawStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 50, y + STATIC_BLOCK_SIZE * 6 * 3 + 180, "LINES", GetColor(255, 255, 255), score_font);
-    DrawFormatStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 70, y + STATIC_BLOCK_SIZE * 6 * 3 + 200, GetColor(255, 255, 255), pause_font, "%d", sum_linenum);
-
-    if (iscount) {
-        SetDrawBlendMode(DX_BLENDMODE_ALPHA, 180);
-        DrawBox(0, 0, WINDOW_SIZE_X - 1, WINDOW_SIZE_Y - 1, GetColor(0, 0, 0), TRUE);
-        SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);		//ブレンドモードをオフ
-        if (opening_count > 0) {
-            DrawFormatStringToHandle(WINDOW_SIZE_X / 2, WINDOW_SIZE_Y / 2 - 50, GetColor(255, 255, 255), count_font, "%d", opening_count);
-        }
-        else DrawStringToHandle(WINDOW_SIZE_X / 2 - 100, WINDOW_SIZE_Y / 2 - 50, "START", GetColor(255, 255, 255), count_font);
-    }
-    
-    if (ispause) {
-        SetDrawBlendMode(DX_BLENDMODE_ALPHA, 180);
-        DrawBox(0, 0, WINDOW_SIZE_X - 1, WINDOW_SIZE_Y - 1, GetColor(0, 0, 0), TRUE);
-        SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);		//ブレンドモードをオフ
-
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 50, CONTINUE_Y, "つづける", GetColor(255, 255, 255), pause_font);
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 50, RESTART_Y,  "やりなおす", GetColor(255, 255, 255), pause_font);
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 50, END_Y,      "やめる", GetColor(255, 255, 255), pause_font);
-
-        switch (NowSelect) {//現在の選択状態に従って処理を分岐
-        case ePause_Continue://ゲーム選択中なら
-            pause_y = CONTINUE_Y;    //ゲームの座標を格納
-            break;
-        case ePause_Restart://設定選択中なら
-            pause_y = RESTART_Y;    //設定の座標を格納
-            break;
-        case ePause_End://設定選択中なら
-            pause_y = END_Y;    //設定の座標を格納
-            break;
-        }
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 100, pause_y, "■", GetColor(255, 255, 255), pause_font);
-    }
-    else if (isGameClear) {
-        SetDrawBlendMode(DX_BLENDMODE_ALPHA, 180);
-        DrawBox(0, 0, WINDOW_SIZE_X - 1, WINDOW_SIZE_Y - 1, GetColor(0, 0, 0), TRUE);
-        SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);		//ブレンドモードをオフ
-
-        if (score > highscore) { 
-
-            if (fopen_s(&fp, "savedates/highscore_normal.txt", "w") != NULL) {
-                //ファイルオープン失敗
-            }
-            else {
-                fprintf(fp, "%d", score);
-                fclose(fp);
-            }
-            DrawStringToHandle(WINDOW_SIZE_X / 2 - 100, 180, "HIGH SCORE", GetColor(255, 255, 255), pause_font);
-        }
-
-
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 200,100, "GAME CLEAR", GetColor(255, 255, 255), count_font);
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 50, CONTINUE_Y, "もういちど遊ぶ", GetColor(255, 255, 255), pause_font);
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 50, END_Y, "メニューに戻る", GetColor(255, 255, 255), pause_font);
-
-        switch (NowSelect) {//現在の選択状態に従って処理を分岐
-        case eResult_Restart://ゲーム選択中なら
-            pause_y = CONTINUE_Y;    //ゲームの座標を格納
-            break;
-        case eResult_End://設定選択中なら
-            pause_y = END_Y;    //設定の座標を格納
-            break;
-        }
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 100, pause_y, "■", GetColor(255, 255, 255), pause_font);
-    }
-    else if (isGameOver) {
-        SetDrawBlendMode(DX_BLENDMODE_ALPHA, 180);
-        DrawBox(0, 0, WINDOW_SIZE_X - 1, WINDOW_SIZE_Y - 1, GetColor(0, 0, 0), TRUE);
-        SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);		//ブレンドモードをオフ
-
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 200, 100, "GAME OVER", GetColor(255, 255, 255), count_font);
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 50, CONTINUE_Y, "もういちど遊ぶ", GetColor(255, 255, 255), pause_font);
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 50, END_Y, "メニューに戻る", GetColor(255, 255, 255), pause_font);
-
-        switch (NowSelect) {//現在の選択状態に従って処理を分岐
-        case eResult_Restart://ゲーム選択中なら
-            pause_y = CONTINUE_Y;    //ゲームの座標を格納
-            break;
-        case eResult_End://設定選択中なら
-            pause_y = END_Y;    //設定の座標を格納
-            break;
-        }
-        DrawStringToHandle(WINDOW_SIZE_X / 2 - 100, pause_y, "■", GetColor(255, 255, 255), pause_font);
-    }
+    DrawStringToHandle(x - STATIC_BLOCK_SIZE * 5 + 5, y + 5, "HOLD", GetColor(255, 255, 255), index_font);
+    DrawStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 50 + 5, y + 5, "NEXT", GetColor(255, 255, 255), index_font);
+    DrawStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 50, y + STATIC_BLOCK_SIZE * 6 * 3, "SCORE", GetColor(255, 255, 255), index_font);
+    DrawFormatStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 70, y + STATIC_BLOCK_SIZE * 6 * 3 + 20, GetColor(255, 255, 255), figure_font, "%d", score);
+    DrawStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 50, y + STATIC_BLOCK_SIZE * 6 * 3 + 60, "HIGH SCORE", GetColor(255, 255, 255), index_font);
+    //DrawFormatStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 70, y + STATIC_BLOCK_SIZE * 6 * 3 + 80, GetColor(255, 255, 255), figure_font, "%d", highscore);
+    DrawStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 50, y + STATIC_BLOCK_SIZE * 6 * 3 + 120, "LEVEL", GetColor(255, 255, 255), index_font);
+    DrawFormatStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 70, y + STATIC_BLOCK_SIZE * 6 * 3 + 140, GetColor(255, 255, 255), figure_font, "%d", level);
+    DrawStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 50, y + STATIC_BLOCK_SIZE * 6 * 3 + 180, "LINES", GetColor(255, 255, 255), index_font);
+    DrawFormatStringToHandle(x + FIELD_SIDE_X * BLOCK_SIZE + 70, y + STATIC_BLOCK_SIZE * 6 * 3 + 200, GetColor(255, 255, 255), figure_font, "%d", sum_linenum);
 }
 
-void Player::Finalize()
+void Player::finalize()
 {
     delete(mino);
     delete(field);

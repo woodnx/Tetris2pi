@@ -25,7 +25,7 @@ void SceneMgr::Update() {
             mScene = (BaseScene*) new Menu(this);   //メニュー画面のインスタンスを生成する
             break;//以下略
         case eScene_Normal:
-            mScene = (BaseScene*) new Player(this);
+            mScene = (BaseScene*) new OnePlayerGame(this);
             break;
         //case eScene_Tetlis2pi:
         //    mScene = (BaseScene*) new Game2pi(this);

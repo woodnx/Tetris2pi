@@ -22,6 +22,7 @@
     <ClCompile Include="sources\BaseScene.cpp" />
     <ClCompile Include="sources\Blocks.cpp" />
     <ClCompile Include="sources\Field.cpp" />
+    <ClCompile Include="sources\OnePlayerGame.cpp" />
     <ClCompile Include="sources\Player.cpp" />
     <ClCompile Include="sources\include.cpp" />
     <ClCompile Include="sources\ISceneChanger.cpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="headers\BaseScene.h" />
     <ClInclude Include="headers\Blocks.h" />
     <ClInclude Include="headers\Field.h" />
+    <ClInclude Include="headers\OnePlayerGame.h" />
     <ClInclude Include="headers\Player.h" />
     <ClInclude Include="headers\include.h" />
     <ClInclude Include="headers\ISceneChanger.h" />
@@ -59,26 +61,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
